@@ -1,0 +1,39 @@
+# Environment files
+../.venv/
+venv/
+**/.env
+
+# Compiled Python files
+*.pyc
+__pycache__/
+
+# Database files
+db.sqlite3
+
+# Static files (usually managed by collectstatic)
+static/
+staticfiles/
+back_static/
+back_media/
+
+# Media files
+media/
+
+# IDE/Editor specific files
+.idea/
+.vscode/
+pycharm/
+
+# Local configuration files
+local_settings.py
+
+# Coverage reports
+coverage/
+*.log
+
+# Test database
+test.db
+
+# Migrations (ignore everything except __init__.py)
+**/migrations/**
+!**/migrations/__init__.py
