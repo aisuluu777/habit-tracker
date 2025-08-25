@@ -1,24 +1,32 @@
-from pathlib import Path
 from decouple import config
+from pathlib import Path
 import os
 
-BASE_DIR = Path(__file__).resolve().parent.parent
 
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 SECRET_KEY = config('SECRET_KEY')
 
-DEBUG = config('DEBUG') == True
+DEBUG = config('DEBUG') == 'True'
 
-PRODUCTION = config('PRODUCTION') == True
+PRODUCTION = config('PRODUCTION') == 'True'
 
 if PRODUCTION:
-    # from .cors import *
-    from .prod import *
+    from .prod import(
+        ALLOWED_HOSTS,
+        DATABASES,
+    )
 else:
-    from .dev import *
+    from .dev import (
+        ALLOWED_HOSTS,
+        DATABASES,
+    )
 
 ALLOWED_HOSTS = ALLOWED_HOSTS
 DATABASES = DATABASES
+
+GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID')
+CLIENT_SECRET = config('CLIENT_SECRET')
 
 
 INSTALLED_APPS = [
@@ -28,12 +36,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
+    'rest_framework'
     'apps.users',
     'apps.habits',
 ]
 
 AUTH_USER_MODEL = 'users.CustomUser'
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -50,7 +59,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -63,9 +72,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
-
-
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -82,16 +88,17 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LANGUAGE_CODE = 'ru'
 
+LOCALE_PATHS = [BASE_DIR / 'locale']
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Bishkek'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_L10N = True
 
+USE_TZ = True
 
 STATIC_URL = '/back_static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'back_static')
@@ -105,7 +112,5 @@ STATICFILES_FINDERS = [
 
 MEDIA_URL = '/back_media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "back_media")
-
-
-
+    
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
