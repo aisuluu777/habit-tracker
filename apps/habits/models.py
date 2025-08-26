@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
-from .chioses import DAYS_OF_THE_WEEK
+from .chioses import DAYS_OF_THE_WEEK, STATUS
 
 User = get_user_model
 
@@ -21,3 +21,8 @@ class HabitModel(models.Model):
         return f'{self.title} for {self.user_id.full_name}'
     
 
+class HabitCompleteModel(models.Model):
+    habit_id = models.ForeignKey(HabitModel)
+    status = models.BooleanField(default=False, verbose_name='status')
+    note = models.TextField(verbose_name='Notes')
+    date = models.DateField(auto_now_add=True)

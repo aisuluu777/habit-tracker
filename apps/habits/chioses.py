@@ -8,3 +8,8 @@ DAYS_OF_THE_WEEK = [
     ('Sun', 'Sunday')
 ]
 
+
+STATUS = [
+    ('completed', 'completed'),
+    ('skipped', 'skipped')
+]
