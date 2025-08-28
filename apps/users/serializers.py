@@ -7,7 +7,6 @@ from .utils import send_otp_code, get_email_from_cache
 from django.contrib.auth.password_validation import validate_password
 
 class CustomUsererializer(serializers.Serializer):
-    username = serializers.CharField()
     full_name = serializers.CharField(required=True)
     email = serializers.EmailField(required=True)
     password = serializers.CharField(validators=[validate_password])
@@ -16,11 +15,12 @@ class CustomUsererializer(serializers.Serializer):
         username = validated_data.get('username')
         full_name = validated_data.get('full_name')
         email = validated_data.get('email')
-        user = CustomUser.objects.create_user(
+        user = CustomUser.objects.create(
             username=username, full_name=full_name, email=email
         )
         user.set_password(self.validated_data.get('password'))
         user.save()
+        return user
 
 
     def send_code(self):

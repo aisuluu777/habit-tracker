@@ -21,7 +21,7 @@ class RegisterUserView(CreateAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(status=HTTP_201_CREATED)
+        return Response(data=serializer.validated_data, status=HTTP_201_CREATED)
     
 
 class RegisterCodeVerifyView(CreateAPIView):
