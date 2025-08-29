@@ -8,7 +8,7 @@ from django.conf import settings
 def greed_registered_users(sender,instance ,created, **kwargs):
     if created:
         
-        subject = 'Hello {instance.full_name}!'
+        subject = f'Hello {instance.full_name}!'
         message = 'We`re happy to see you. Enjoy habit-tracker. Set habits - be happy'
         send_mail(
             subject=subject,

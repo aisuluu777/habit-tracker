@@ -3,15 +3,17 @@ from .models import CustomUser
 from .serializers import CustomUsererializer, RegisterCodeVerify
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
-from rest_framework.status import HTTP_201_CREATED, HTTP_200_OK, HTTP_400_BAD_REQUEST
+from rest_framework.status import HTTP_201_CREATED, HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_202_ACCEPTED
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.generics import GenericAPIView
 import urllib
 import requests
 import uuid
 from django.shortcuts import redirect
 from django.conf import settings
+from .utils import send_otp_code
 
 class RegisterUserView(CreateAPIView):
     queryset = CustomUser
@@ -21,18 +23,19 @@ class RegisterUserView(CreateAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(data=serializer.validated_data, status=HTTP_201_CREATED)
+        response = serializer.send_code()
+        return Response(response, status=HTTP_201_CREATED)
     
 
-class RegisterCodeVerifyView(CreateAPIView):
-    queryset = CustomUser
+class RegisterCodeVerifyView(GenericAPIView):
     serializer_class = RegisterCodeVerify
 
-    def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.update()
-        return Response(status=HTTP_200_OK)
+        # response = serializer.get_token()
+        return Response(data={'succesfully verified email'}, status=HTTP_202_ACCEPTED)
     
 
 

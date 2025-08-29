@@ -5,11 +5,18 @@ from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from .models import CustomUser
 from .utils import send_otp_code, get_email_from_cache
 from django.contrib.auth.password_validation import validate_password
+from django.core.validators import EmailValidator
 
 class CustomUsererializer(serializers.Serializer):
     full_name = serializers.CharField(required=True)
-    email = serializers.EmailField(required=True)
+    email = serializers.EmailField(validators=[EmailValidator],required=True)
     password = serializers.CharField(validators=[validate_password])
+
+    def validate_email(self, email):
+        if CustomUser.objects.filter(email=email).exists():
+            return serializers.ValidationError("Пользователь с таким email уже существует")
+        else:
+            return email
 
     def create(self, validated_data):
         username = validated_data.get('username')
@@ -25,7 +32,7 @@ class CustomUsererializer(serializers.Serializer):
 
     def send_code(self):
         send_otp_code(self.validated_data['email'])
-        return Response(data={'Otp code sent succesfully'})
+        return {'message' : 'otp code sent'}
     
 
 class RegisterCodeVerify(serializers.Serializer):
@@ -38,11 +45,11 @@ class RegisterCodeVerify(serializers.Serializer):
             return code
         return Response(data='Wrong OTP code', status=HTTP_400_BAD_REQUEST)
     
-    def update(self, instance, validated_data):
-        instance.is_active = True
-        instance.is_verified = True
-        instance.save
-        return instance
+    def update(self):
+        self.instance.is_active = True
+        self.instance.is_verified = True
+        self.instance.save()
+        return self.instance
     
     
 

@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import HabitModel, ProgressModel
 
-# Register your models here.
+admin.site.register(HabitModel)
+admin.site.register(ProgressModel)
+

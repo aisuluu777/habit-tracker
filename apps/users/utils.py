@@ -1,4 +1,4 @@
-from functools import cache
+from django.core.cache import cache
 import secrets
 from django.core.mail import send_mail
 from django.conf import settings
@@ -10,10 +10,10 @@ def generate_otp():
 
 
 def send_otp_code(email):
-    code = generate_otp
+    code = generate_otp()
     cache.set(code, email)
     subject = 'Your otp code'
-    message = 'here is your otp code {code}'
+    message = f'here is your otp code {code}'
     send_mail(
         subject=subject,
         message=message,
