@@ -41,17 +41,17 @@ class RegisterCodeVerify(serializers.Serializer):
     def validate_code(self, code):
         email = get_email_from_cache(code=code)
         if email:
-            self.instance = CustomUser.objects.get(email=email)
-            return code
-        return Response(data='Wrong OTP code', status=HTTP_400_BAD_REQUEST)
+            try:
+                user = CustomUser.objects.get(email=email)
+                return user
+            
+            except CustomUser.DoesNotExist:
+                raise serializers.ValidationError("User not found.")
+            
+        raise serializers.ValidationError("Wrong OTP code.")
+
     
-    def update(self):
-        self.instance.is_active = True
-        self.instance.is_verified = True
-        self.instance.save()
-        return self.instance
-    
-    
+
 
 
     

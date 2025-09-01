@@ -23,4 +23,4 @@ def send_otp_code(email):
     )
 
 def get_email_from_cache(code):
-    cache.get(code)
+    return cache.get(code)

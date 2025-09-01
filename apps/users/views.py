@@ -32,10 +32,13 @@ class RegisterCodeVerifyView(GenericAPIView):
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.update()
-        # response = serializer.get_token()
-        return Response(data={'succesfully verified email'}, status=HTTP_202_ACCEPTED)
+        if serializer.is_valid(raise_exception=True):
+            user = serializer.validated_data['code']
+            user.is_active = True
+            user.is_verified = True
+            user.update()
+            return Response(data=self.serializer_class(user), status=HTTP_202_ACCEPTED)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
     
 
 
