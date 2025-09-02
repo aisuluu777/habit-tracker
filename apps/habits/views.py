@@ -1,4 +1,3 @@
-import now
 from django.shortcuts import render
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView, GenericAPIView
 from rest_framework.views import APIView
@@ -31,9 +30,9 @@ class ProgressMark(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         date = serializer.validated_data.get('date')
         habit_id = serializer.validated_data.get('habit_id')
-        habit = ProgressModel.objects.filter(habit_id=habit_id, user=self.request.user)
+        habit = ProgressModel.objects.filter(habit_id=habit_id, user=self.request.user.id)
         if date:
-            ProgressModel.objects.filter(habit_id=habit, date=date).exists()
+            ProgressModel.objects.filter(habit_id=habit_id, date=date).exists()
             return Response(data={'Object with this date already exists'}, status=HTTP_400_BAD_REQUEST)
         else:
             today = now().date()

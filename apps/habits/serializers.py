@@ -6,7 +6,7 @@ class HabitSerializer(serializers.ModelSerializer):
         model = HabitModel
         fields = ['title', 'body', 'frequency']
 
-class ProgressSerializer(serializers.Serializer):
+class ProgressSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProgressModel
         fields = ['habit_id', 'user', 'status', 'note', 'date']
