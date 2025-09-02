@@ -1,20 +1,22 @@
+from django.core.cache import cache
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 # from simplejwt import
 from .models import CustomUser
-from .utils import send_otp_code, get_email_from_cache
+from .utils import send_otp_code, get_email_from_cache, generate_otp
 from django.contrib.auth.password_validation import validate_password
 from django.core.validators import EmailValidator
 
-class CustomUsererializer(serializers.Serializer):
+class CustomUseSerializer(serializers.Serializer):
     full_name = serializers.CharField(required=True)
     email = serializers.EmailField(validators=[EmailValidator],required=True)
     password = serializers.CharField(validators=[validate_password])
 
     def validate_email(self, email):
         if CustomUser.objects.filter(email=email).exists():
-            return serializers.ValidationError("Пользователь с таким email уже существует")
+            raise serializers.ValidationError('Пользователь с таким email уже существует')
         else:
             return email
 
@@ -25,14 +27,18 @@ class CustomUsererializer(serializers.Serializer):
         user = CustomUser.objects.create(
             username=username, full_name=full_name, email=email
         )
-        user.set_password(self.validated_data.get('password'))
+        user.set_password(validated_data.get('password'))
         user.save()
         return user
 
 
     def send_code(self):
-        send_otp_code(self.validated_data['email'])
-        return {'message' : 'otp code sent'}
+        code = generate_otp()
+        cache.set(self.validated_data['email'], code, settings.OTP_CACHE_TIMEOUT)
+        send_otp_code(self.validated_data['email'], code)
+        print(code)
+        return {'data': 'сообщение было отправлено'}
+
     
 
 class RegisterCodeVerify(serializers.Serializer):
@@ -47,8 +53,8 @@ class RegisterCodeVerify(serializers.Serializer):
             
             except CustomUser.DoesNotExist:
                 raise serializers.ValidationError("User not found.")
-            
-        raise serializers.ValidationError("Wrong OTP code.")
+
+
 
     
 

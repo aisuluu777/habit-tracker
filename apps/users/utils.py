@@ -9,9 +9,7 @@ def generate_otp():
     return ''.join(secrets.choice(numbers) for i in range(6))
 
 
-def send_otp_code(email):
-    code = generate_otp()
-    cache.set(code, email)
+def send_otp_code(email, code):
     subject = 'Your otp code'
     message = f'here is your otp code {code}'
     send_mail(

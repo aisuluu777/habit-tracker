@@ -1,3 +1,4 @@
+import now
 from django.shortcuts import render
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView, GenericAPIView
 from rest_framework.views import APIView
@@ -10,18 +11,18 @@ from .serializers import HabitSerializer,  ProgressSerializer, ProgressHistorySe
 from django.db.models import Count
 
 class HabitListCreateView(ListCreateAPIView):
-    queryset = HabitModel
+    queryset = HabitModel.objects.all()
     serializer_class = HabitSerializer
 
 
 class HabitDetailView(RetrieveUpdateDestroyAPIView):
-    queryset = HabitModel
+    queryset = HabitModel.objects.all()
     serializer_class = HabitSerializer
     lookup_field = 'id'
 
 
 class ProgressMark(CreateAPIView):
-    queryset = ProgressModel
+    queryset = ProgressModel.objects.all()
     serializer_class = ProgressSerializer
 
 
@@ -35,14 +36,14 @@ class ProgressMark(CreateAPIView):
             ProgressModel.objects.filter(habit_id=habit, date=date).exists()
             return Response(data={'Object with this date already exists'}, status=HTTP_400_BAD_REQUEST)
         else:
-            now = now.date
-            progress = ProgressModel.objects.create(serializer.validated_data, date=now)
+            today = now().date()
+            progress = ProgressModel.objects.create(**serializer.validated_data, date=today)
             return Response(data=self.serializer_class(progress), status=HTTP_201_CREATED)
         
 
 
 class StatisticView(GenericAPIView):
-    queryset = ProgressModel
+    queryset = ProgressModel.objects.all()
     serializer_class = ProgressHistorySerializer
 
     def get(self, request):

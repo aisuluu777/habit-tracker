@@ -9,7 +9,7 @@ class HabitSerializer(serializers.ModelSerializer):
 class ProgressSerializer(serializers.Serializer):
     class Meta:
         model = ProgressModel
-        fields = ['habit_id', 'user', 'status', 'note']
+        fields = ['habit_id', 'user', 'status', 'note', 'date']
 
 class ProgressHistorySerializer(serializers.Serializer):
     progreses = ProgressSerializer(many=True, read_only=True)

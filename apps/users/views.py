@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import CustomUser
-from .serializers import CustomUsererializer, RegisterCodeVerify
+from .serializers import CustomUseSerializer, RegisterCodeVerify
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_202_ACCEPTED
@@ -16,18 +16,21 @@ from django.conf import settings
 from .utils import send_otp_code
 
 class RegisterUserView(CreateAPIView):
-    queryset = CustomUser
-    serializer_class = CustomUsererializer
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUseSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        response = serializer.send_code()
-        return Response(response, status=HTTP_201_CREATED)
+        if serializer.is_valid(raise_exception=True):
+            user = serializer.save()
+            serializer.send_code()
+            return Response(data=self.serializer_class(user).data, status=HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
     
 
 class RegisterCodeVerifyView(GenericAPIView):
+    queryset = CustomUser.objects.all()
     serializer_class = RegisterCodeVerify
 
     def post(self, request):
@@ -36,9 +39,8 @@ class RegisterCodeVerifyView(GenericAPIView):
             user = serializer.validated_data['code']
             user.is_active = True
             user.is_verified = True
-            user.update()
-            return Response(data=self.serializer_class(user), status=HTTP_202_ACCEPTED)
-        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+            user.save()
+            return Response(data=self.serializer_class(user).data, status=HTTP_202_ACCEPTED)
     
 
 

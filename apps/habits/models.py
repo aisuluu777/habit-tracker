@@ -27,4 +27,4 @@ class ProgressModel(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='users')
     status = models.BooleanField(default=False, verbose_name='status')
     note = models.TextField(verbose_name='Notes')
-    date = models.DateField(auto_now_add=True)
+    date = models.DateField()
