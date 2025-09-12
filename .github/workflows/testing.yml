@@ -1,0 +1,8 @@
+name: My-first-workflow
+on: [push, workflow_dispatch]
+jobs:
+  greeting:
+    runs-on: windows-latest
+    steps:
+      - name: hello world
+        run: echo 'hello world, i wanna sleep'
