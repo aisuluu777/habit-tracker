@@ -1,0 +1,8 @@
+name: My-first-workflow
+on: [push,  workflow_dispatch]
+jobs: 
+  greeting:
+    runs-on: windows-latest
+    steps:
+      - name: Greeting
+        run: echo "Hello World, im learning CI CD"
