@@ -1,3 +1,5 @@
+import base64
+from io import BytesIO
 from django.shortcuts import render
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView, GenericAPIView
 from rest_framework.views import APIView
@@ -8,6 +10,7 @@ from datetime import timedelta
 from .models import HabitModel, ProgressModel
 from .serializers import HabitSerializer,  ProgressSerializer, ProgressHistorySerializer
 from django.db.models import Count
+import qrcode
 
 class HabitListCreateView(ListCreateAPIView):
     queryset = HabitModel.objects.all()
@@ -79,8 +82,22 @@ class StatisticView(GenericAPIView):
             
 
             
+import qrcode
 
+# твоя ссылка на оплату
+payment_url = "https://payment-provider.com/pay?amount=1000&currency=KGS&order=12345"
 
+# создаём QR-код
+qr = qrcode.QRCode(
+    version=1,
+    box_size=10,
+    border=4
+)
+qr.add_data(payment_url)
+qr.make(fit=True)
 
-            
+# генерируем изображение
+img = qr.make_image(fill="black", back_color="white")
+img.save("payment_qr.png")
+
 
