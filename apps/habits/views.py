@@ -35,13 +35,15 @@ class ProgressMark(CreateAPIView):
         habit_id = serializer.validated_data.get('habit_id')
         habit = ProgressModel.objects.filter(habit_id=habit_id, user=self.request.user.id)
         if date:
-            ProgressModel.objects.filter(habit_id=habit_id, date=date).exists()
-            return Response(data={'Object with this date already exists'}, status=HTTP_400_BAD_REQUEST)
-        else:
+            if ProgressModel.objects.filter(habit_id=habit_id, date=date).exists():
+                return Response(data={'Object with this date already exists'}, status=HTTP_400_BAD_REQUEST)
+            else:
+                marks = ProgressModel.objects.create(**serializer.validated_data)
+                return Response(data=self.serializer_class(marks).data, status=HTTP_201_CREATED)
+        else:  
             today = now().date()
             progress = ProgressModel.objects.create(**serializer.validated_data, date=today)
-            return Response(data=self.serializer_class(progress), status=HTTP_201_CREATED)
-        
+            return Response(data=self.serializer_class(progress).data, status=HTTP_201_CREATED)
 
 
 class StatisticView(GenericAPIView):
@@ -62,14 +64,14 @@ class StatisticView(GenericAPIView):
             next_month = start.replace(month=start.month + 1) if start < 12 else start.replace(year=start.year + 1, month=1)
             end = next_month - timedelta(days=1)
         else:
-            total = ProgressModel.objects.filter(habit_id=habit_id).aaggregate(
+            total = ProgressModel.objects.filter(habit_id=habit_id).aggregate(
                 total=Count('id')
             )
-            return Response(data=self.serializer_class(total), status=HTTP_200_OK)
+            return Response(data=self.serializer_class(total).data, status=HTTP_200_OK)
 
         statistic = ProgressModel.objects.filter(
             habit_id=habit_id, 
-            date__range=(start, end) ).aaggregate(completed_count=Count('id'))
+            date__range=(start, end)).aggregate(completed_count=Count('id'))
         
         return Response({
                 'period' : period,
@@ -82,22 +84,22 @@ class StatisticView(GenericAPIView):
             
 
             
-import qrcode
+# import qrcode
 
-# твоя ссылка на оплату
-payment_url = "https://payment-provider.com/pay?amount=1000&currency=KGS&order=12345"
+# # твоя ссылка на оплату
+# payment_url = "https://payment-provider.com/pay?amount=1000&currency=KGS&order=12345"
 
-# создаём QR-код
-qr = qrcode.QRCode(
-    version=1,
-    box_size=10,
-    border=4
-)
-qr.add_data(payment_url)
-qr.make(fit=True)
+# # создаём QR-код
+# qr = qrcode.QRCode(
+#     version=1,
+#     box_size=10,
+#     border=4
+# )
+# qr.add_data(payment_url)
+# qr.make(fit=True)
 
-# генерируем изображение
-img = qr.make_image(fill="black", back_color="white")
-img.save("payment_qr.png")
+# # генерируем изображение
+# img = qr.make_image(fill="black", back_color="white")
+# img.save("payment_qr.png")
 
 
